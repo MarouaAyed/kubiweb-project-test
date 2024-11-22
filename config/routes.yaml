@@ -1,0 +1,9 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+
+create_or_update_product:
+    path: /api/products
+    controller: App\Controller\ProductController::createOrUpdateProduct
+    methods: [POST]

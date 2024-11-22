@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Mes Commandes
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">
+            Gestion des commandes
+        </h1>
+
+        <!-- Table des commandes -->
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>
+                        N°
+                    </th>
+                    <th>Numéro de Commande</th>
+                    <th>Nom et Prénom</th>
+                    <th>Email</th>
+                    <th>Montant Total</th>
+                    <th>Date de Commande</th>
+                    <th>Status</th>
+                    <th>Détails</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commande in commandes %}
+                    <tr>
+                        <td>
+                            {{ loop.index }}
+                        </td>
+                        <td>
+                            <a href="{{ path('commande_details', { 'id': commande.id }) }}">
+                                {{ commande.numCmd }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ commande.client.nom }} {{ commande.client.prenom }}
+                        </td>
+                        <td>
+                            {{ commande.client.email }}
+                        </td>
+                        <td>
+                            {{ commande.total|number_format(2, '.', ',') }} €
+                        </td>
+                        <td>
+                            {{ commande.dateCommande|date('d/m/Y H:i') }}
+                        </td>
+                        <td>
+                            {% if commande.status == "En cours" %}
+                                En cours
+                            {% elseif commande.status == "validée" %}
+                                Validée
+                            {% else %}
+                                Annulée
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ path('commande_details', { 'id': commande.id }) }}" class="btn btn-info btn-sm">Voir Détails</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+api_platform:
+    # Configurez la version d'API Platform si nécessaire
+    version: '2.6'
+
+    # Configuration de la route pour la documentation
+    documentation:
+        description: "Documentation de l'API pour votre projet"
+        versions: ['1.0']
+        # Vous pouvez personnaliser d'autres éléments comme les tags, les filtres, etc.
+
+    # La route pour l'interface Swagger UI
+    swagger:
+        # Personnalisation de l'interface
+        ui:
+            enabled: true
+            url: '/api/docs.json'  # URL du fichier JSON de la documentation
+            # Vous pouvez ajouter d'autres options ici pour personnaliser l'interface Swagger
+
+    # Configurer les ressources exposées par API Platform
+    resource:
+        # Vous pouvez spécifier les entités à exposer si nécessaire
+        # Exposer toutes les entités dans le dossier src/Entity
+        # Or spécifier les entités explicitement :
+        # App\Entity\Product: ~
