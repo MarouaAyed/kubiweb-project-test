@@ -46,7 +46,7 @@ class CommandeController extends AbstractController
 
         $userRepository = $entityManager->getRepository(Client::class);
 
-        $user = $userRepository->findOneBy([], ['id' => 'ASC']);
+        $user = $userRepository->findOneBy([], ['id' => 'DESC']);
 
         $commande = $commandeRepository->findActiveCommande($user);
 
@@ -69,7 +69,7 @@ class CommandeController extends AbstractController
 
         $user = $userRepository->findOneBy([], ['id' => 'DESC']);
 
-        //dd(  $user);
+        // dd(  $user);
         if (!$user) {
             throw new \Exception("Utilisateur non connecté");
         }
@@ -78,22 +78,21 @@ class CommandeController extends AbstractController
 
 
         if (!$commande) {
-
             $yearMonth = (new \DateTime())->format('m-Y');
 
-    // Chercher la dernière commande pour ce mois
-    $lastCommande = $commandeRepository->findLastCommandeOfMonth($yearMonth);
+            // Chercher la dernière commande pour ce mois
+            $lastCommande = $commandeRepository->findLastCommandeOfMonth($yearMonth);
 
-    // Extraire et incrémenter le numéro de commande si nécessaire
-    if ($lastCommande) {
-        $lastNumCmd = (int) substr($lastCommande->getNumCmd(), 3, 4); // Extraire le numéro de la commande
-        $nextNum = $lastNumCmd + 1;
-    } else {
-        $nextNum = 1; // Si aucune commande n'existe, commencer à 1
-    }
+            // Extraire et incrémenter le numéro de commande si nécessaire
+            if ($lastCommande) {
+                $lastNumCmd = (int) substr($lastCommande->getNumCmd(), 3, 4); // Extraire le numéro de la commande
+                $nextNum = $lastNumCmd + 1;
+            } else {
+                $nextNum = 1; // Si aucune commande n'existe, commencer à 1
+            }
 
-    // Créer un nouveau numéro de commande
-    $numCmd = 'CMD' . str_pad($nextNum, 4, '0', STR_PAD_LEFT) . '-' . $yearMonth;
+            // Créer un nouveau numéro de commande
+            $numCmd = 'CMD' . str_pad($nextNum, 4, '0', STR_PAD_LEFT) . '-' . $yearMonth;
 
             $commande = new Commande();
             $commande->setNumCmd($numCmd);
@@ -126,43 +125,43 @@ class CommandeController extends AbstractController
         return $this->redirectToRoute('commande_client');
     }
 
-/**
- * @Route("/commande/update_quantite/{id}", name="update_quantite", methods={"POST"})
- */
-public function updateQuantite(Request $request, LigneCommande $ligneCommande)
-{
-    $quantite = $request->request->get('quantite');
-    
-    if ($quantite && $quantite > 0) {
-        $produit = $ligneCommande->getProduit();
-        $stockDisponible = $produit->getQuantiteStock();
+    /**
+     * @Route("/commande/update_quantite/{id}", name="update_quantite", methods={"POST"})
+     */
+    public function updateQuantite(Request $request, LigneCommande $ligneCommande)
+    {
+        $quantite = $request->request->get('quantite');
 
-        // Vérifier que la nouvelle quantité ne dépasse pas le stock disponible
-        if ($quantite <= $stockDisponible) {
-            $ancienneQuantite = $ligneCommande->getQuantite();
-            $differenceQuantite = $quantite - $ancienneQuantite;
+        if ($quantite && $quantite > 0) {
+            $produit = $ligneCommande->getProduit();
+            $stockDisponible = $produit->getQuantiteStock();
 
-            $ligneCommande->setQuantite($quantite);
+            // Vérifier que la nouvelle quantité ne dépasse pas le stock disponible
+            if ($quantite <= $stockDisponible) {
+                $ancienneQuantite = $ligneCommande->getQuantite();
+                $differenceQuantite = $quantite - $ancienneQuantite;
 
-            $produit->setQuantiteStock($stockDisponible - $differenceQuantite);
+                $ligneCommande->setQuantite($quantite);
 
-            $prixTotalLigne = $ligneCommande->getProduit()->getPrixTtc() * $quantite;
-            $commande = $ligneCommande->getCommande();
-            $commande->setTotal($commande->getTotal() - $ligneCommande->getProduit()->getPrixTtc() * $ancienneQuantite + $prixTotalLigne);
+                $produit->setQuantiteStock($stockDisponible - $differenceQuantite);
 
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->flush();
+                $prixTotalLigne = $ligneCommande->getProduit()->getPrixTtc() * $quantite;
+                $commande = $ligneCommande->getCommande();
+                $commande->setTotal($commande->getTotal() - $ligneCommande->getProduit()->getPrixTtc() * $ancienneQuantite + $prixTotalLigne);
+
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->flush();
+            } else {
+                $this->addFlash('error', 'La quantité demandée dépasse le stock disponible.');
+            }
         } else {
-            $this->addFlash('error', 'La quantité demandée dépasse le stock disponible.');
+            // Si la quantité est invalide (inférieure ou égale à 0)
+            $this->addFlash('error', 'Quantité invalide.');
         }
-    } else {
-        // Si la quantité est invalide (inférieure ou égale à 0)
-        $this->addFlash('error', 'Quantité invalide.');
-    }
 
-    // Rediriger vers la page de commande du client
-    return $this->redirectToRoute('commande_client');
-}
+        // Rediriger vers la page de commande du client
+        return $this->redirectToRoute('commande_client');
+    }
 
 
     /**
@@ -189,44 +188,44 @@ public function updateQuantite(Request $request, LigneCommande $ligneCommande)
 
 
     /**
- * @Route("/commande/valider/{id}", name="valider_commande", methods={"POST"})
- */
-public function validerCommande(Commande $commande)
-{
-    if ($commande && $commande->getStatus() !== 'validée') {
-        $commande->setStatus('validée');
-        
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->flush();
+     * @Route("/commande/valider/{id}", name="valider_commande", methods={"POST"})
+     */
+    public function validerCommande(Commande $commande)
+    {
+        if ($commande && $commande->getStatus() !== 'validée') {
+            $commande->setStatus('validée');
 
-        $this->addFlash('success', 'Votre commande a été validée avec succès.');
-    } else {
-        $this->addFlash('error', 'Erreur : la commande est déjà validée ou introuvable.');
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre commande a été validée avec succès.');
+        } else {
+            $this->addFlash('error', 'Erreur : la commande est déjà validée ou introuvable.');
+        }
+
+        return $this->redirectToRoute('commande_index');
     }
 
-    return $this->redirectToRoute('commande_index');
-}
+    /**
+     * @Route("/commande/details/{id}", name="commande_details")
+     */
+    public function detailsCommande($id)
+    {
+        // Vous récupérez la commande par son ID
+        $commande = $this->getDoctrine()->getRepository(Commande::class)->find($id);
 
-/**
- * @Route("/commande/details/{id}", name="commande_details")
- */
-public function detailsCommande($id)
-{
-    // Vous récupérez la commande par son ID
-    $commande = $this->getDoctrine()->getRepository(Commande::class)->find($id);
+        if (!$commande) {
+            throw $this->createNotFoundException('Commande non trouvée');
+        }
 
-    if (!$commande) {
-        throw $this->createNotFoundException('Commande non trouvée');
+        // Vous récupérez les lignes de commande associées
+        $lignes = $commande->getLignes();
+
+        return $this->render('commande/details.html.twig', [
+            'commande' => $commande,
+            'lignes' => $lignes
+        ]);
     }
-
-    // Vous récupérez les lignes de commande associées
-    $lignes = $commande->getLignes();
-
-    return $this->render('commande/details.html.twig', [
-        'commande' => $commande,
-        'lignes' => $lignes
-    ]);
-}
 
 
 }
