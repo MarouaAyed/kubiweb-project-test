@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Liste des produits
+{% endblock %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-body">
+                {% if produits|length > 0 %}
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        {% for produit in produits %}
+                            <div class="col">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {{ produit.titre }}
+                                        </h5>
+                                        <p class="card-text">
+                                            <strong>
+                                                Quantité en Stock :
+                                            </strong>
+                                            {{ produit.quantiteStock }}
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>
+                                                Marque :
+                                            </strong>
+                                            {{ produit.marque ? produit.marque.nom : 'Aucune' }}
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>
+                                                Prix TTC :
+                                            </strong>
+                                            {{ produit.prixTtc }}
+                                            €
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>
+                                                Types :
+                                            </strong>
+                                            {{ produit.types }}
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>
+                                                Genre :
+                                            </strong>
+                                            {{ produit.genre }}
+                                        </p>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <a href="{{ path('commander', {'id': produit.id}) }}" class="btn btn-sm btn-primary">
+                                            Ajouter à ma commande
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ knp_pagination_render(produits) }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning text-center">
+                        Aucun produit trouvé.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

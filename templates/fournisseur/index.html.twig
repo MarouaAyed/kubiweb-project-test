@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Liste des fournisseurs
+{% endblock %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    Liste des fournisseurs
+                </h3>
+                <a href="{{ path('produit_list') }}" class="btn btn-light btn-sm">
+                    Retour
+                </a>
+            </div>
+            <div class="text-end m-2">
+                <a href="{{ path('add_fournisseur') }}" class="btn btn-success">
+                    Ajouter un fournisseur
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>
+                                N°
+                            </th>
+                            <th>
+                                Nom
+                            </th>
+                            <th>
+                                Marque
+                            </th>
+                            <th>
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fournisseur in fournisseurs %}
+                            <tr>
+                                <td>
+                                    {{ loop.index }}
+                                </td>
+                                <td>
+                                    {{ fournisseur.nom }}
+                                </td>
+                                <td>
+                                    {{ fournisseur.marque ? fournisseur.marque.nom : 'Aucune' }}
+                                </td>
+                                <td>
+                                    <a href="{{ path('edit_fournisseur', {'id': fournisseur.id}) }}" class="btn btn-sm btn-warning">
+                                        Modifier
+                                    </a>
+                                    <form method="post" action="{{ path('delete_fournisseur', {'id': fournisseur.id}) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ fournisseur.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce fournisseur ?')">
+                                                Supprimer
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        Aucun fournisseur trouvé.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-center">
+                        {{ knp_pagination_render(fournisseurs) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+    

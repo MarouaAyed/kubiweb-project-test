@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Liste des produits
+{% endblock %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    Liste des produits
+                </h3>
+                <a href="{{ path('fournisseur_index') }}" class="btn btn-light btn-sm">
+                    Fournisseurs
+                </a>
+            </div>
+            <div class="text-end m-2">
+                <a href="{{ path('add_produit') }}" class="btn btn-success">
+                    Ajouter un produit
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>
+                                N°
+                            </th>
+                            <th>
+                                Titre
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+                                Quantité en Stock
+                            </th>
+                            <th>
+                                Marque
+                            </th>
+                            <th>
+                                Prix ttc
+                            </th>
+                            <th>
+                                Types
+                            </th>
+                            <th>
+                                Genre
+                            </th>
+                            <th>
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produit in produits %}
+                            <tr>
+                                <td>
+                                    {{ loop.index }}
+                                </td>
+                                <td>
+                                    {{ produit.titre }}
+                                </td>
+                                <td>
+                                    {{ produit.description }}
+                                </td>
+                                <td>
+                                    {{ produit.quantiteStock }}
+                                </td>
+                                <td>
+                                    {{ produit.marque ? produit.marque.nom : 'Aucune' }}
+                                </td>
+                                <td>
+                                    {{ produit.prixTtc }}
+                                </td>
+                                <td>
+                                    {{ produit.types }}
+                                </td>
+                                <td>
+                                    {{ produit.genre }}
+                                </td>
+                                <td>
+                                    <a href="{{ path('edit_produit', {'id': produit.id}) }}" class="btn btn-sm btn-warning">
+                                        Modifier
+                                    </a>
+                                    <form method="post" action="{{ path('delete_produit', {'id': produit.id}) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')">
+                                                Supprimer
+                                            </button>
+                                        </form>
+                                        <a href="{{ path('stock_produit', {'id': produit.id}) }}" class="btn btn-sm btn-primary">
+                                            Stock
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center">
+                                        Aucun produit trouvé.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-center">
+                        {{ knp_pagination_render(produits) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

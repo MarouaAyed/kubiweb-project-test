@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Ma Commande
+{% endblock %}
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">
+            Ma Commande
+        </h1>
+        {% if commande is not null %}
+        <p>
+            Numéro de la commande :
+            {{ commande.numCmd }}
+        </p>
+            <p>
+                Date de Commande :
+                {{ commande.dateCommande|date('d/m/Y H:i') }}
+            </p>
+            <p>
+                Totale Prix :
+                {{ commande.total|number_format(2, '.', ',') }}
+                €
+            </p>
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>
+                            Produit
+                        </th>
+                        <th>
+                            Quantité
+                        </th>
+                        <th>
+                            Prix Unitaire
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in commande.lignes %}
+                        <tr>
+                            <td>
+                                {{ ligne.produit.titre }}
+                            </td>
+                            <td>
+                                <form method="post" action="{{ path('update_quantite', { 'id': ligne.id }) }}" style="display:inline;">
+                                    <input type="number" name="quantite" value="{{ ligne.quantite }}" min="1" class="form-control" style="width: 80px; display:inline;">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            Modifier
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    {{ ligne.produit.prixTtc|number_format(2, '.', ',') }}
+                                    €
+                                </td>
+                                <td>
+                                    <form method="post" action="{{ path('delete_ligneCommande', { 'id': ligne.id }) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <form method="post" action="{{ path('valider_commande', { 'id': commande.id }) }}" style="text-align: center;">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        Valider la Commande
+                    </button>
+                </form>
+            {% else %}
+                <div class="alert alert-warning text-center">
+                    Aucun commande trouvé.
+                </div>
+            {% endif %}
+        </div>
+    {% endblock %}
+    
