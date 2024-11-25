@@ -11,7 +11,6 @@ use ApiPlatform\Core\Annotation\ApiProperty;
  * @ORM\Entity(repositoryClass="App\Repository\ProduitRepository")
  */
 
-
 class Produit
 {
 

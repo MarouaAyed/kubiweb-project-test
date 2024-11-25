@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -13,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     message="Cet email est déjà utilisé."
  * )
  */
-class Client
+class Client implements PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id()
@@ -46,6 +47,12 @@ class Client
      * @Assert\Email(message="L'adresse email n'est pas valide.")
      */
     private $email;
+
+        /**
+     * @ORM\Column(type="string", length=255)
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $password;
 
     /**
      * @ORM\Column(type="string", length=20)
@@ -111,6 +118,15 @@ class Client
         return $this;
     }
 
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
+    }
     public function getTelephone(): ?string
     {
         return $this->telephone;

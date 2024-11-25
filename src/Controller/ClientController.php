@@ -22,7 +22,7 @@ class ClientController extends AbstractController
     public function inscription(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher, 
+        UserPasswordHasherInterface $passwordHasher,
         JWTTokenManagerInterface $jwtManager
     ): Response {
         $client = new Client();
@@ -33,12 +33,15 @@ class ClientController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
 
+            $defaultPassword = '123456';
+            $hashedPassword = $passwordHasher->hashPassword($client, $defaultPassword);
+            $client->setPassword($hashedPassword);
+
             $entityManager->persist($client);
             $entityManager->flush();
 
-
             $this->addFlash('success', 'Inscription réussie !');
-            return $this->redirectToRoute('client_inscription');  
+            return $this->redirectToRoute('client_inscription');
         }
 
         return $this->render('client/inscription.html.twig', [
